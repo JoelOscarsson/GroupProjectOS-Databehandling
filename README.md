@@ -4,15 +4,27 @@ During this group project we are investigating the dataset: "120 years of Olympi
 
 This project sharpens the skills: Data analysis, data visualisation, python, communication, critial thinking, time-managment aswell as much more.
 
-Tools used:
 
-* Pandas
+Packages used:
+
 * numpy
-* Matplotlib
-* seaborn
-* plotlyexpress
-* ipykernel
+* pandas
 * black
+* ipykernel
+* seaborn
+* openpyxl
+* plotly
+* plotly-express
+* nbformat
+* requests 
+* html5lib
+* bs4
+* lxml
+* python-dotenv
+* matplotlib
+* dash
+* dash-bootstrap-components
+
 
 
 pipenv install numpy pandas matplotlib ipykernel black seaborn
