@@ -11,3 +11,8 @@ Tools used:
 * Matplotlib
 * seaborn
 * plotlyexpress
+* ipykernel
+* black
+
+
+pipenv install numpy pandas matplotlib ipykernel black seaborn
