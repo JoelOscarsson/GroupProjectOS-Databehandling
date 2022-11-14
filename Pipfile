@@ -19,6 +19,7 @@ python-dotenv = "*"
 dash = "*"
 dash-bootstrap-components = "*"
 plotly-express = "*"
+pexpect = "*"
 
 [dev-packages]
 
