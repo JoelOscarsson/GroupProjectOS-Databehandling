@@ -56,6 +56,7 @@ app = dash.Dash(__name__)
 
 app.layout = html.Main([
     html.H1("120 years of OS history"),
+
     html.H2("Exploratory graph"),
 
     dcc.RadioItems(
