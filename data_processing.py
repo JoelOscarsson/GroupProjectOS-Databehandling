@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import plotly_express as px
 from functools import reduce
+import hashlib as hl
 
 
 def get_data_path():
@@ -24,7 +25,8 @@ def load_data(folder_path: str) -> pd.DataFrame:
     # there are duplicates for some reason, dropping them
     df.drop_duplicates(inplace = True)
 
-    # df = df["Name"].apply(lambda x: hl.sha3_256(x.encod()).hexdigest())
+    # anonymize names
+    df["Name"] = df["Name"].apply(lambda x: hl.sha3_256(x.encode()).hexdigest())
 
     return df
 
@@ -33,19 +35,32 @@ class DataProcessing:
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
 
-    def noc(self, noc: str or list):
-        if isinstance(noc, list):
-            self.df = self.df[self.df["NOC"].isin(noc)]
-        else:
+    def noc_filter(self, noc: str or list):
+        if noc == "CHN":
             self.df = self.df[self.df["NOC"] == noc]
         return self
 
-    def sports(self, sports: str or list):
-        if isinstance(sports, list):
-            self.df = self.df[self.df["Sport"].isin(sports)]
-        else:
-            self.df = self.df[self.df["Sport"] == sports]
+    def sort_plot(self, sort: str or list):
+        if "sport" in sort:
+            sorted = list(self.df.groupby("Sport")["Medal"].count().sort_values(ascending=False).index)
+            sort_column = "Sport"
+         
+        elif "countr" in sort:
+            sorted = list(self.df.groupby("NOC")["Medal"].count().sort_values(ascending=False).index)
+            sort_column = "NOC"
+
+        if "top10" in sort:
+            # top10_list = list(self.df.groupby("Sport")["Medal"].count().sort_values(ascending=False).head(10).index)
+            sorted = sorted[:10]
+            self.df = self.df[self.df[sort_column].isin(sorted)]
+
+        # source for sort
+        # https://stackoverflow.com/questions/52784410/sort-column-in-pandas-dataframe-by-specific-order            
+        self.df[sort_column] = pd.Categorical(self.df[sort_column], categories=sorted)
+        self.df.sort_values(sort_column)        
+
         return self
+
 
 
     def olymics_plot_df(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):
