@@ -47,6 +47,71 @@ class DataProcessing:
             self.df = self.df[self.df["Sport"] == sports]
         return self
 
+    def top_10_countries(self):
+        df_ = self.df.copy()  # good to create a copy 
+        df_ = df_[df_["Medal"].isna() == False]
+        df_value_counts = df_.value_counts("NOC")
+        df_top10 = df_value_counts.head(10)
+        df_top10 
+        fig = px.bar(df_top10.reset_index().head(10), x="NOC", y=0, title= "Top 10 Countries Medals")
+        return fig
+
+
+
+    def analysis_on_sports(self):
+        sports = ["Football", "Basketball", "Gymnastics"]
+        for sport in sports:
+            sports_df = self.df[self.df.Sport == sport]
+            # Concating the dummies of Medal
+            sports_df = pd.concat([sports_df, pd.get_dummies(sports_df["Medal"])], axis=1)
+            # removing the duplicates in the football dataset
+            num_medals = sports_df.drop_duplicates(
+                subset=["Team", "NOC", "Games", "Year", "City", "Sport", "Event", "Medal"]
+            )
+            # Sorting by the country and sex with the most gold and creating a column for the total medals
+            num_medals = (
+                num_medals.groupby(["region", "Sex"])
+                .sum(numeric_only=True)[["Gold", "Silver", "Bronze"]]
+                .sort_values("Gold", ascending=False)
+                .reset_index()
+            )
+            num_medals["Total"] = (
+                num_medals["Gold"] + num_medals["Silver"] + num_medals["Bronze"]
+            )
+
+
+            ## visualizing the medal distribution
+            top_country = num_medals.sort_values("Total", ascending=False).reset_index()
+
+
+            fig = px.bar(data_frame = top_country.head(20), x="region"  ,
+                
+                y="Total",
+                labels={"region": "Country", "Total": "Total medals"},
+                title= f"Top 20 Countries With the Most Medals in {sport} In The Olympics",
+                color="region",
+                #log_y= True,
+                barmode= "relative")
+
+
+            fig.update_layout(
+            xaxis_title = "Countries")
+            ## visualizing the gender distribution
+            fig1 = px.bar(data_frame = top_country.head(20), x="region"  ,
+            
+            y="Total",
+            labels={"region": "Country", "Total": "Total medals"},
+            title=f"Gender With The Most Medals in {sport} in the Olympics",
+            color="Sex",
+            #log_y= True,
+            barmode= "group"
+            
+            
+            )
+            fig1.update_layout(
+                    xaxis_title = "Countries")
+            return fig, fig1
+
 
     def olymics_plot_df(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):
         """

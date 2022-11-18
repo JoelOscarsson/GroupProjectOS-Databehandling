@@ -126,6 +126,10 @@ def chart_options_filter(chart):
 )
 def update_graph(country, chart, x, y, grouping, plot):
 
+    if chart
+
+
+
     # if chart == "joel_charts":
         # return df.joel_plots(argument)
     if country == "China":
