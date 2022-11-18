@@ -69,7 +69,6 @@ class DataProcessing:
         Returns plotly express plot when specified (plot="line", plot="bar" and plot="scatter" supported).
         Otherwise returns the processed pd.DataFrame for manual creation of plots.
         """
-
         df = self.df
 
         if not grouping:
