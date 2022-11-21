@@ -74,31 +74,3 @@ class DataProcessing:
         fig = plt.pie(gender_count, labels =["M","F"], autopct="%.2f", explode= myexplode)
         plt.title("Sex distribution among the athletes")
         return fig
-
-
-# class DataProcessing()
-
-
-
-# En klass med olika methods 
-# Filtrera på land
-
-
-# path = r"Data/"
-# os.chdir(path)
-
-
-# def create_df():
-#     """ read all files with end ".csv" from a specified folder and create dataframes
-#     :return: dataframes
-#     """
-#     file_list = []
-#     for file in sorted(os.listdir()):
-#         if file.endswith(".csv"):
-#             file_path = f"../{path}{file}"
-#             file_list.append(file_path)
-
-#     athlete_event = pd.read_csv(file_list[0])
-#     noc_regions = pd.read_csv(file_list[1])
-#     os.chdir('..')
-#     return athlete_event, noc_regions

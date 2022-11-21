@@ -34,21 +34,6 @@ def load_data(folder_path: str) -> pd.DataFrame:
     return df
 
 
-def load_data2(folder_path: str) -> pd.DataFrame:
-    # File pathes
-    regions = pd.read_csv("Data/noc_regions.csv")
-    athlete_events = pd.read_csv("Data/athlete_events.csv")
-
-    # Concatinating 
-    df2 = pd.concat([df2,regions], keys="NOC")
-    # Merging
-    df2 = pd.merge(df2, regions, how="left", on="NOC")
-
-    # anonymize names
-    df2["Name"] = df2["Name"].apply(lambda x: hl.sha3_256(x.encode()).hexdigest())
-
-    return df2
-
 
 class DataProcessing:
     def __init__(self, df: pd.DataFrame) -> None:
@@ -80,10 +65,10 @@ class DataProcessing:
 
         return self
 
-    def top_10_countries_medals(df2):
+    def top_10_countries_medals(self):
         """Making a new DF that is cleaned.
         Gives out visualization """
-        df1 = df2.groupby("region")["Medal"].count().nlargest(10).nlargest(10).reset_index()
+        df1 = self.df.groupby("region")["Medal"].count().nlargest(10).nlargest(10).reset_index()
         plt.figure(figsize=(12,6))
         plt.title("10 countries with the most medals")
         plt.xlabel("Regions")
@@ -95,7 +80,7 @@ class DataProcessing:
     #fig = top_10_countries_medals(athlete_events)
 
 
-    def age_distribution_athletes(df2):
+    def age_distribution_athletes(self):
         """Plotting age distribution with a histogram, aswell as sorting df"""
         plt.figure(figsize=(12, 6))
         plt.title("Age distribution of the athletes")
@@ -104,20 +89,18 @@ class DataProcessing:
         # https://numpy.org/doc/stable/reference/generated/numpy.arange.html
         # https://stackoverflow.com/questions/33458566/how-to-choose-bins-in-matplotlib-histogram
         fig = plt.hist(
-            df2.Age, bins=np.arange(10, 80, 2), color="blue", edgecolor="white"
+            self.df.Age, bins=np.arange(10, 80, 2), color="blue", edgecolor="white"
         )
         return fig
 
 
-    def sex_distribution_athletes(df2):
+    def sex_distribution_athletes(self):
         """Cleaning df and visualization as pie chart"""
-        gender_count = df2.Sex.value_counts()
+        gender_count = self.df.Sex.value_counts()
         myexplode = (0.02, 0.02) # Splitting the pie chart
-        plt.pie(gender_count, labels =["M","F"], autopct="%.2f", explode= myexplode)
+        fig = plt.pie(gender_count, labels =["M","F"], autopct="%.2f", explode= myexplode)
         plt.title("Sex distribution among the athletes")
-        return
-
-    #sex_distribution_athletes(df)
+        return fig
 
 
     def olymics_plot_df(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):

@@ -100,58 +100,6 @@ app.layout = html.Main([
     ]
 )
 
-# @app.callback(
-#     Output("chart-dropdown", "options"),
-#     Input("country-radio", "value"),
-# )
-# def chart_filter(country):
-#     if country == "China":
-#         chart_options = [
-#                 {"label": "Explorative", "value": "explorative"},
-#                 {"label": "China2", "value": "china2"},  
-#         ]
-#     else:
-#         chart_options = [
-#                 {"label": "Explorative", "value": "explorative"},
-#                 {"label": "All2", "value": "all2"},  
-#         ]        
-#     return chart_options
-
-
-# @app.callback(
-#     Output("x-dropdown", "options"),
-#     Output("y-dropdown", "options"),
-#     Output("grouping-dropdown", "options"),
-#     Input("chart-dropdown", "value")
-# )
-# def chart_options_filter(chart):
-#     if chart == "china2":
-#         x_options_dropdown = [
-#             {"label": "test", "value": "test"}
-#         ]
-#     else:  
-#         x_options_dropdown = [
-#             {"label": "Olympic games", "value": "Games"},
-#             {"label": "Countries", "value": "NOC"},
-#             {"label": "Sports", "value": "Sport"},
-#             {"label": "Years", "value": "Year"},
-#             {"label": "Age", "value": "Age"},
-#             {"label": "Height", "value": "Height"},    
-#             {"label": "Weight", "value": "Weight"}
-#         ]
-#     y_options_dropdown = [
-#         {"label": "Participants", "value": "ID"},
-#         {"label": "Number of medals", "value": "Medal"},
-#         {"label": "Age", "value": "Age"},
-#         {"label": "Height", "value": "Height"},
-#         {"label": "Weight", "value": "Weight"}
-#     ]
-#     grouping_options_dropdown = [
-#         {"label": "Sports", "value": "Sport"},
-#         {"label": "Sex", "value": "Sex"},
-#         {"label": "Season", "value": "Season"},
-#     ]    
-#     return x_options_dropdown, y_options_dropdown, grouping_options_dropdown
 
 
 @app.callback(
@@ -164,6 +112,7 @@ app.layout = html.Main([
     Input("grouping-dropdown", "value"),
     Input("plot-radio", "value"),
 )
+
 def update_graph(country, sort, x, y, grouping, plot):
 
     df = DataProcessing(load_data(get_data_path())).noc_filter(country)
@@ -173,6 +122,25 @@ def update_graph(country, sort, x, y, grouping, plot):
 
     return df.olymics_plot_df(x, y, grouping=grouping, plot=plot)
 
+@app.callback(
+    Output("top10-country-medals", "figure"),
+    Output("age-distribution-athletes", "figure"),
+    Output("sex-distribution", "figure"),
+    Input("num_dropdown", "value"),
+    Input("num_dropdown", "value"),
+    Input("num_dropdown", "value"),
+)
+
+def update_graph2(num, df):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.top_10_countries_medals(num)
+    fig2 = df.age_distribution_athletes()
+    fig3 = df.sex_distribution_athletes()
+
+    return fig, fig2, fig3
+
 
 if __name__ == "__main__":
     app.run_server(debug = True)
+
