@@ -24,8 +24,6 @@ def load_data(folder_path: str) -> pd.DataFrame:
     # merge to also get country names
     # keep all rows from athlete_events.csv, even if NOC is not in noc_regions.csv
     df = pd.merge(files[0], files[1], on = "NOC", how = "left")
-    #df = pd.concat([df,region], keys='NOC')   --- Need to do this to get the graphs working
-    #df = pd.merge(df, [region,] how='left', on='NOC')    
 
     # there are duplicates for some reason, dropping them
     df.drop_duplicates(inplace = True)
@@ -34,6 +32,22 @@ def load_data(folder_path: str) -> pd.DataFrame:
     df["Name"] = df["Name"].apply(lambda x: hl.sha3_256(x.encode()).hexdigest())
 
     return df
+
+
+def load_data2(folder_path: str) -> pd.DataFrame:
+    # File pathes
+    regions = pd.read_csv("Data/noc_regions.csv")
+    athlete_events = pd.read_csv("Data/athlete_events.csv")
+
+    # Concatinating 
+    df2 = pd.concat([df2,regions], keys="NOC")
+    # Merging
+    df2 = pd.merge(df2, regions, how="left", on="NOC")
+
+    # anonymize names
+    df2["Name"] = df2["Name"].apply(lambda x: hl.sha3_256(x.encode()).hexdigest())
+
+    return df2
 
 
 class DataProcessing:
@@ -66,10 +80,10 @@ class DataProcessing:
 
         return self
 
-    def top_10_countries_medals(df):
+    def top_10_countries_medals(df2):
         """Making a new DF that is cleaned.
         Gives out visualization """
-        df1 = df.groupby("region")["Medal"].count().nlargest(10).nlargest(10).reset_index()
+        df1 = df2.groupby("region")["Medal"].count().nlargest(10).nlargest(10).reset_index()
         plt.figure(figsize=(12,6))
         plt.title("10 countries with the most medals")
         plt.xlabel("Regions")
@@ -81,22 +95,23 @@ class DataProcessing:
     #fig = top_10_countries_medals(athlete_events)
 
 
-    def age_distribution_athletes(df):
+    def age_distribution_athletes(df2):
         """Plotting age distribution with a histogram, aswell as sorting df"""
         plt.figure(figsize=(12, 6))
         plt.title("Age distribution of the athletes")
         plt.xlabel("Age")
         plt.ylabel("Number of Participants")
         # https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+        # https://stackoverflow.com/questions/33458566/how-to-choose-bins-in-matplotlib-histogram
         fig = plt.hist(
-            df.Age, bins=np.arange(10, 80, 2), color="blue", edgecolor="white"
+            df2.Age, bins=np.arange(10, 80, 2), color="blue", edgecolor="white"
         )
         return fig
 
 
-    def sex_distribution_athletes(df):
+    def sex_distribution_athletes(df2):
         """Cleaning df and visualization as pie chart"""
-        gender_count = df.Sex.value_counts()
+        gender_count = df2.Sex.value_counts()
         myexplode = (0.02, 0.02) # Splitting the pie chart
         plt.pie(gender_count, labels =["M","F"], autopct="%.2f", explode= myexplode)
         plt.title("Sex distribution among the athletes")
