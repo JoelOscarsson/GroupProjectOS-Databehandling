@@ -35,39 +35,63 @@ class DataProcessing:
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
 
-    def noc_filter(self, noc: str or list):
-        if noc == "CHN":
-            self.df = self.df[self.df["NOC"] == noc]
-        return self
+    def filter_noc(self, noc: str or list):
+        df = self.df
 
-    def sort_plot(self, sort: str or list):
-        if "sport" in sort:
-            sorted = list(self.df.groupby("Sport")["Medal"].count().sort_values(ascending=False).index)
-            sort_column = "Sport"
-         
-        elif "countr" in sort:
-            sorted = list(self.df.groupby("NOC")["Medal"].count().sort_values(ascending=False).index)
-            sort_column = "NOC"
+        if isinstance(noc, list):
+            df = df[df["NOC"].isin(noc)]
+        elif not noc == "all":
+            df = df[df["NOC"] == noc]
 
-        if "top10" in sort:
-            # top10_list = list(self.df.groupby("Sport")["Medal"].count().sort_values(ascending=False).head(10).index)
-            sorted = sorted[:10]
-            self.df = self.df[self.df[sort_column].isin(sorted)]
+        return DataProcessing(df)
 
-        # source for sort
-        # https://stackoverflow.com/questions/52784410/sort-column-in-pandas-dataframe-by-specific-order            
-        self.df[sort_column] = pd.Categorical(self.df[sort_column], categories=sorted)
-        self.df.sort_values(sort_column)        
+    def filter_season(self, season: str):
+        df = self.df
+        df = df[df["Season"] == season]
 
-        return self
+        return DataProcessing(df)
 
+    def filter_top(self, filter_col: str, filter_on_col: str, num: int):
+        df = self.df
+
+        filter_ = list(df.groupby(filter_col)[filter_on_col].count().sort_values(ascending=False).head(num).index)
+        df = df[df[filter_col].isin(filter_)]
+
+        return DataProcessing(df)
+        
 
 
-    def olymics_plot_df(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):
+    
+    def proportion_plot(self, x, y, per, grouping = None):
+        df_count = self.basic_plot(x, y, grouping).df
+        df_total = self.basic_plot(x, per, grouping).df
+
+        
+        df_list = []
+        for i in self.df[grouping].unique():
+            # checks proportion of y in each category of grouping
+            df = pd.merge(df_count[[x, i]], df_total[[x, i]], on = x, suffixes = ["_count", "_total"])
+            df[i] = df[i + "_count"] / df[i + "_total"]
+            df = df.iloc[:,[0,-1]] # keep only x and proportion
+            df_list.append(df)
+
+        # merging a list of dfs
+        # source https://statisticsglobe.com/merge-list-pandas-dataframes-python
+        df = reduce(lambda left, right:
+                        pd.merge(left , right,
+                                on = [x],
+                                how = "outer"),
+                        df_list)         
+
+        # fig = px.bar(df, x = x, y = list(df.columns[1:]), barmode = "group")
+        return DataProcessing(df)
+
+
+    def basic_plot(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):
         """
         Quick processing of OS data for plotting x on y, with optional grouping.
-        Returns plotly express plot when specified (plot="line", plot="bar" and plot="scatter" supported).
-        Otherwise returns the processed pd.DataFrame for manual creation of plots.
+        Returns plotly express plot when specified (plot="histo", plot="line", plot="bar" and plot="scatter" supported).
+        Otherwise returns the processed pd.DataFrame for manual creation of plots or further processing.
         """
         df = self.df
 
@@ -123,14 +147,50 @@ class DataProcessing:
                 y = groups,
                 labels = {"variable": grouping, "value": y})            
             return fig
+        elif plot == "histo":
+            fig = px.histogram(
+                df,
+                barmode = "group",
+                nbins = 50,
+                histnorm = 'probability density',
+                x = x,
+                y = groups,
+                labels = {"variable": grouping, "value": y})            
+            return fig            
         elif plot == "line":
             fig = px.line(
                 df,
                 x = x,
                 y = groups,
+                markers=True,
                 labels = {"variable": grouping, "value": y})
             return fig
         else:
-            self.df = df
-            return self
+            return DataProcessing(df)
+
+
+    def basic_plot_sort(self, sort: str or list):
+        """Sorting sports and countries by medal in the basic plot."""
+        df = self.df
+
+        if "sport" in sort:
+            sorted = list(df.groupby("Sport")["Medal"].count().sort_values(ascending=False).index)
+            sort_column = "Sport"
+         
+        elif "countr" in sort:
+            sorted = list(df.groupby("NOC")["Medal"].count().sort_values(ascending=False).index)
+            sort_column = "NOC"
+
+        if "top10" in sort:
+            # top10_list = list(self.df.groupby("Sport")["Medal"].count().sort_values(ascending=False).head(10).index)
+            sorted = sorted[:10]
+            df = df[df[sort_column].isin(sorted)]
+
+        # source for sort
+        # https://stackoverflow.com/questions/52784410/sort-column-in-pandas-dataframe-by-specific-order            
+        df[sort_column] = pd.Categorical(df[sort_column], categories=sorted)
+        df.sort_values(sort_column)        
+
+        return DataProcessing(df)
+
 
