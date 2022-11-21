@@ -96,14 +96,14 @@ app.layout = html.Main([
      dbc.Row(className='mt-4', children=[
         dbc.Col(
             # responsivity
-            html.P("Choose sport:"), xs="12", sm="12", md="6", lg="4", xl={"size": 1, "offset": 1},
-            className="mt-1"
+            html.P("Choose sport:"), 
+            
         ),
         dbc.Col(
             dcc.Dropdown(id='sport-dropdown', className='',
                          options=sport_options_dropdown,
                          value='All sports',
-                         placeholder='All sports'), xs="12", sm="12", md="12", lg="4", xl="3"),
+            ),
 
         dbc.Col([
             dbc.Card([
@@ -112,7 +112,7 @@ app.layout = html.Main([
                                   value='Total'
                                ),
             ])
-        ], xs="12", sm="12", md="12", lg='4', xl="3"),
+        ]
     ]),
 
     html.P("Choose y"),    
