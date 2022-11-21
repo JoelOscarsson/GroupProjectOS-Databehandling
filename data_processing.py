@@ -3,6 +3,9 @@ import pandas as pd
 import plotly_express as px
 from functools import reduce
 import hashlib as hl
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 
 
 def get_data_path():
@@ -21,6 +24,8 @@ def load_data(folder_path: str) -> pd.DataFrame:
     # merge to also get country names
     # keep all rows from athlete_events.csv, even if NOC is not in noc_regions.csv
     df = pd.merge(files[0], files[1], on = "NOC", how = "left")
+    #df = pd.concat([df,region], keys='NOC')   --- Need to do this to get the graphs working
+    #df = pd.merge(df, [region,] how='left', on='NOC')    
 
     # there are duplicates for some reason, dropping them
     df.drop_duplicates(inplace = True)
@@ -61,71 +66,43 @@ class DataProcessing:
 
         return self
 
-    def top_10_countries(self):
-        df_ = self.df.copy()  # good to create a copy 
-        df_ = df_[df_["Medal"].isna() == False]
-        df_value_counts = df_.value_counts("NOC")
-        df_top10 = df_value_counts.head(10)
-        df_top10 
-        fig = px.bar(df_top10.reset_index().head(10), x="NOC", y=0, title= "Top 10 Countries Medals")
+    def top_10_countries_medals(df):
+        """Making a new DF that is cleaned.
+        Gives out visualization """
+        df1 = df.groupby("region")["Medal"].count().nlargest(10).nlargest(10).reset_index()
+        plt.figure(figsize=(12,6))
+        plt.title("10 countries with the most medals")
+        plt.xlabel("Regions")
+        plt.ylabel("Medals")
+        plt.xticks(rotation=90)
+        fig = sns.barplot(x=df1["region"], y=df1["Medal"], palette='pastel')
+        return fig
+
+    #fig = top_10_countries_medals(athlete_events)
+
+
+    def age_distribution_athletes(df):
+        """Plotting age distribution with a histogram, aswell as sorting df"""
+        plt.figure(figsize=(12, 6))
+        plt.title("Age distribution of the athletes")
+        plt.xlabel("Age")
+        plt.ylabel("Number of Participants")
+        # https://numpy.org/doc/stable/reference/generated/numpy.arange.html
+        fig = plt.hist(
+            df.Age, bins=np.arange(10, 80, 2), color="blue", edgecolor="white"
+        )
         return fig
 
 
+    def sex_distribution_athletes(df):
+        """Cleaning df and visualization as pie chart"""
+        gender_count = df.Sex.value_counts()
+        myexplode = (0.02, 0.02) # Splitting the pie chart
+        plt.pie(gender_count, labels =["M","F"], autopct="%.2f", explode= myexplode)
+        plt.title("Sex distribution among the athletes")
+        return
 
-    def analysis_on_sports(self):
-        sports = ["Football", "Basketball", "Gymnastics"]
-        for sport in sports:
-            sports_df = self.df[self.df.Sport == sport]
-            # Concating the dummies of Medal
-            sports_df = pd.concat([sports_df, pd.get_dummies(sports_df["Medal"])], axis=1)
-            # removing the duplicates in the football dataset
-            num_medals = sports_df.drop_duplicates(
-                subset=["Team", "NOC", "Games", "Year", "City", "Sport", "Event", "Medal"]
-            )
-            # Sorting by the country and sex with the most gold and creating a column for the total medals
-            num_medals = (
-                num_medals.groupby(["region", "Sex"])
-                .sum(numeric_only=True)[["Gold", "Silver", "Bronze"]]
-                .sort_values("Gold", ascending=False)
-                .reset_index()
-            )
-            num_medals["Total"] = (
-                num_medals["Gold"] + num_medals["Silver"] + num_medals["Bronze"]
-            )
-
-
-            ## visualizing the medal distribution
-            top_country = num_medals.sort_values("Total", ascending=False).reset_index()
-
-
-            fig = px.bar(data_frame = top_country.head(20), x="region"  ,
-                
-                y="Total",
-                labels={"region": "Country", "Total": "Total medals"},
-                title= f"Top 20 Countries With the Most Medals in {sport} In The Olympics",
-                color="region",
-                #log_y= True,
-                barmode= "relative")
-
-
-            fig.update_layout(
-            xaxis_title = "Countries")
-            ## visualizing the gender distribution
-            fig1 = px.bar(data_frame = top_country.head(20), x="region"  ,
-            
-            y="Total",
-            labels={"region": "Country", "Total": "Total medals"},
-            title=f"Gender With The Most Medals in {sport} in the Olympics",
-            color="Sex",
-            #log_y= True,
-            barmode= "group"
-            
-            
-            )
-            fig1.update_layout(
-                    xaxis_title = "Countries")
-            return fig, fig1
-
+    #sex_distribution_athletes(df)
 
 
     def olymics_plot_df(self, x: str, y: str, grouping: str = None, reverse_sort: bool = False, plot: str = None):
