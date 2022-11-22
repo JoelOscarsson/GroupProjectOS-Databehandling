@@ -1,4 +1,4 @@
-# By - Johan, Joel Oscarsson, Abdulrazak
+# By - Johan Sandberg, Joel Oscarsson, Abdulrazak Ahmed
 <img src="https://user-images.githubusercontent.com/112272227/203309644-c24f0b44-099b-402b-abfc-4633ed96b0c9.png" width="350" height="230">
 
 ## GroupProjectOS-Databehandling
