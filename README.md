@@ -3,14 +3,14 @@ By - Johan, Joel Oscarsson, Abdulrazak
 
 
 
-# During this group project we are investigating the dataset: "120 years of Olympic history: athletes and results". Our country to investigate are China. And create a # dashboard with the results.
+## During this group project we are investigating the dataset: "120 years of Olympic history: athletes and results". Our country to investigate are China. And create a dashboard with the results.
 https://wpmedia.judo.se/2019/05/olympic-games-1608127_1280.png
 
-# This project sharpens the skills: 
+## This project sharpens the skills: 
 Data analysis, data visualisation, python, Dash bootstrap, communication, critial thinking, time-management and more...
 
 
-# What we've done:
+## What we've done:
 First we have gathered some initial information about the data from the dataset.
 
 After that we have made visual representations about China, Age/Weight/Height/Sex distributions. We did three visuals for All countries aswell with similar parameters. Also we ca
