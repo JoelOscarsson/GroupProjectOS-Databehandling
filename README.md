@@ -25,7 +25,7 @@ First we have gathered some initial information about the data from the dataset.
 After that we have made visual representations about China, Age/Weight/Height/Sex distributions and made several visuals. We did some exploration and visuals for All countries aswell with similar parameters. And also we picked three sports with Age/Height/Gender participation/medals.
 
 We then have deployed these interactie visuals to a dashboard. 
-INSERT LINK HERE
+https://groupprojectos.herokuapp.com/
 
 
 
