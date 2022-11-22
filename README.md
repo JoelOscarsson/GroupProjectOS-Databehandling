@@ -36,7 +36,7 @@ If your project has a lot of features, consider adding a "Features" section and 
 
 
 
-1. 📦 Install dependencies. Packages used:
+## 1. 📦 Install dependencies. Packages used:
 ```py
 pip install pipenv
 ```
