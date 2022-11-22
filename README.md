@@ -1,10 +1,11 @@
-# GroupProjectOS-Databehandling
-By - Johan, Joel Oscarsson, Abdulrazak
+<img src="https://user-images.githubusercontent.com/112272227/203309644-c24f0b44-099b-402b-abfc-4633ed96b0c9.png" width="350" height="230">
+
+## GroupProjectOS-Databehandling
+# By - Johan, Joel Oscarsson, Abdulrazak
 
 
 
 ## During this group project we are investigating the dataset: "120 years of Olympic history: athletes and results". Our country to investigate are China. And create a dashboard with the results.
-https://wpmedia.judo.se/2019/05/olympic-games-1608127_1280.png
 
 ## This project sharpens the skills: 
 Data analysis, data visualisation, python, Dash bootstrap, communication, critial thinking, time-management and more...
