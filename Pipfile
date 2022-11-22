@@ -21,6 +21,7 @@ dash-bootstrap-components = "*"
 plotly-express = "*"
 pexpect = "*"
 black = "*"
+gunicorn = "*"
 
 [dev-packages]
 
