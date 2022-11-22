@@ -44,6 +44,7 @@ class Layout:
             {"label": "Ranked medal counts", "value": "bar"},
             {"label": "History per sport", "value": "line"},
         ]
+
         sports_list = list(
             self._df.filter_noc("CHN")
             .df.groupby("Sport")["Medal"]
@@ -54,6 +55,38 @@ class Layout:
         )
         sports_list.insert(0, "All")
         self._g3_sports_options = [{"label": i, "value": i} for i in sports_list]
+
+        self._num_options = [
+            {"label": 5, "value": 5},
+            {"label": 10, "value": 10},
+            {"label": 15, "value": 15},
+            {"label": 20, "value": 20},
+        ]
+
+        self._dist_options = [
+            {"label": "Age", "value": "Age"},
+            {"label": "Height", "value": "Height"},
+            {"label": "Weight", "value": "Weight"},
+        ]                
+        self._dist2_options = [
+            {"label": "Sex", "value": "Sex"},
+            {"label": "Sport", "value": "Sport"},
+        ]               
+
+        self._a1_sport_options = [
+            {"label": "Football", "value": "Football"},
+            {"label": "Basketball", "value": "Basketball"},
+            {"label": "Gymnastics", "value": "Gymnastics"},
+        ]               
+        self._a1_plot_options = [
+            {"label": "All", "value": "All"},
+            {"label": "Divided by sex", "value": "Sex"},
+        ]          
+        self._a2_sport_options = [
+            {"label": "Football", "value": "Football"},
+            {"label": "Basketball", "value": "Basketball"},
+            {"label": "Gymnastics", "value": "Gymnastics"},
+        ]   
 
     def layout(self):
         return dbc.Container(
@@ -202,6 +235,7 @@ class Layout:
                         )
                     ],
                 ),
+
                 dbc.Row(className="mt-5"),
                 dbc.Row(className="mt-5"),
                 dbc.Card(
@@ -211,7 +245,7 @@ class Layout:
                 dbc.Row(
                     className="mt-4",
                     children=[
-                        dbc.Col(html.P("Plot:"), className="mt-1", lg = 1),
+                        dbc.Col(html.P("Plot:"), className="mt-1", lg=1),
                         dbc.Col(
                             dbc.Card(
                                 dcc.RadioItems(
@@ -222,9 +256,13 @@ class Layout:
                                     labelStyle={"display": "block"},
                                 ),
                             ),
-                            lg = 3
+                            lg=3,
                         ),
-                        dbc.Col(html.P("Choose sport:"), className="mt-1", lg = {"offset": 2, "size": 2}),
+                        dbc.Col(
+                            html.P("Choose sport:"),
+                            className="mt-1",
+                            lg={"offset": 2, "size": 2},
+                        ),
                         dbc.Col(
                             dcc.Dropdown(
                                 id="g3-sports-dropdown",
@@ -232,10 +270,86 @@ class Layout:
                                 options=self._g3_sports_options,
                                 value="All",
                             ),
-                            lg = 4
+                            lg=4,
                         ),
                     ],
                 ),
                 dbc.Row(dcc.Graph(id="g3-china-sports-graph"), className="mt-4"),
+                dbc.Row(className="mt-5"),
+                dbc.Row(className="mt-5"),                    
+                dbc.Card(
+                    dbc.CardBody(html.H2("All countries: Top performers")),
+                    className="mt-3",
+                ),               
+                dbc.Row(dcc.Graph(id="top10-country-medals"), className="mt-4"),
+                dbc.Row(
+                    dcc.RadioItems(
+                        id="num_dropdown",
+                        options=self._num_options, value=10)
+                    ),
+                dbc.Row(className="mt-5"),
+                dbc.Row(className="mt-5"),                    
+                dbc.Card(
+                    dbc.CardBody(html.H2("All countries: Age/Weight/Height distributions")),
+                    className="mt-3",
+                ),
+                dbc.Row(
+                    dcc.RadioItems(
+                        id = "dist-radio",
+                        options = self._dist_options,
+                        value = "Age"
+                    )),
+                dbc.Row(dcc.Graph(id="age-distribution-athletes"), className="mt-4"),    
+                dbc.Row(className="mt-5"),
+                dbc.Row(className="mt-5"),                    
+                dbc.Card(
+                    dbc.CardBody(html.H2("All countries: Sex distribution")),
+                    className="mt-3",
+                ),
+                dbc.Row(
+                    dcc.RadioItems(
+                        id = "dist2-radio",
+                        options = self._dist2_options,
+                        value = "Sex"
+                    )),
+                dbc.Row(dcc.Graph(id="sex-distribution"), className="mt-4"),    
+                dbc.Row(className="mt-5"),
+                dbc.Row(className="mt-5"),                    
+                dbc.Card(
+                    dbc.CardBody(html.H2("Sports: Medal count")),
+                    className="mt-3",
+                ),
+                dbc.Row(
+                    dcc.RadioItems(
+                        id = "a1-sport-radio",
+                        options = self._a1_sport_options,
+                        value = "Football"
+                    )),
+                dbc.Row(
+                    dcc.RadioItems(
+                        id = "a1-plot-radio",
+                        options = self._a1_plot_options,
+                        value = "All"
+                    )),                    
+                dbc.Row(dcc.Graph(id="a1-sport-medals-graph"), className="mt-4"),
+                dbc.Row(className="mt-5"),
+                dbc.Row(className="mt-5"),
+                dbc.Card(
+                    dbc.CardBody(html.H2("Sports: Age distribution")),
+                    className="mt-3",
+                ),                               
+                dbc.Row(
+                    dcc.RadioItems(
+                        id = "a2-sport-radio",
+                        options = self._a2_sport_options,
+                        value = "Football"
+                    )),
+                # dbc.Row(
+                #     dcc.RadioItems(
+                #         id = "a1-plot-radio",
+                #         options = self._a1_plot_options,
+                #         value = "All"
+                #     )),                    
+                dbc.Row(dcc.Graph(id="a2-dist-graph"), className="mt-4"),                                                                
             ]
         )

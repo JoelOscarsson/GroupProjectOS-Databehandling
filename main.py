@@ -1,10 +1,9 @@
 import dash
 from dash.dependencies import Output, Input
-from dash import html, dcc
 import dash_bootstrap_components as dbc
-import pandas as pd
 import plotly_express as px
 from layout import Layout
+import matplotlib.pyplot as plt
 
 from data_processing import get_data_path, load_data, DataProcessing
 
@@ -104,8 +103,6 @@ def update_graph2(dist, plot, slider):
 )
 def update_graph3(plot, sport):
     df = DataProcessing(load_data(get_data_path())).filter_noc("CHN")
-    # if season:
-    # df = df.filter_season(season)
 
     if plot == "bar":
         labels = {"value": "Medal count", "variable": "Sex"}
@@ -116,12 +113,7 @@ def update_graph3(plot, sport):
             df.df = df.df[df.df["Total"] >= 5]
             df.df = df.df.sort_values(by="Total", ascending=False)
 
-            fig = px.bar(
-                df.df,
-                x="Sport",
-                y=["M", "F"],
-                labels=labels
-            )
+            fig = px.bar(df.df, x="Sport", y=["M", "F"], labels=labels)
         else:
             df.df = df.df[df.df["Sport"] == sport]
             df = df.basic_plot("Medal", "ID", grouping="Sex")
@@ -134,6 +126,7 @@ def update_graph3(plot, sport):
                 y=["M", "F"],
                 barmode="group",
                 labels=labels,
+                title=sport,
             )
 
     elif plot == "line":
@@ -144,13 +137,67 @@ def update_graph3(plot, sport):
             fig = df.basic_plot("Games", "Medal", grouping="Sport", plot="line")
         else:
             df.df = df.df[df.df["Sport"] == sport]
-            fig = df.basic_plot("Games", "Medal", plot="line")
+            fig = df.basic_plot("Games", "Medal", plot="line", title=sport)
 
         # df = df["Sport"]
         # df = df.filter_top("Sport", "Medal", 5)
 
         # fig.update_layout(title_text="Chinese medals per OS by sport")
 
+    return fig
+
+
+@app.callback(
+    Output("top10-country-medals", "figure"),
+    Input("num_dropdown", "value"),
+)
+def update_graph2(num):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.top_10_countries_medals(num)
+    return fig
+
+
+@app.callback(
+    Output("age-distribution-athletes", "figure"),
+    Input("dist-radio", "value"),
+)
+def update_graph2(dist):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.age_distribution_athletes(dist)
+    return fig
+
+
+@app.callback(
+    Output("sex-distribution", "figure"),
+    Input("dist2-radio", "value"),
+)
+def update_graph2(dist2):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.sex_distribution_athletes(dist2)
+    return fig
+
+@app.callback(
+    Output("a1-sport-medals-graph", "figure"),
+    Input("a1-sport-radio", "value"),
+    Input("a1-plot-radio", "value"),
+)
+def update_graph2(sport, plot):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.sports_medal_plot(sport, plot)
+    return fig
+
+@app.callback(
+    Output("a2-dist-graph", "figure"),
+    Input("a2-sport-radio", "value"),
+)
+def update_graph2(sport):
+    df = DataProcessing(load_data(get_data_path()))
+
+    fig = df.sports_dist_plot(sport)
     return fig
 
 
