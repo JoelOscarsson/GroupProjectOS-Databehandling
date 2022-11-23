@@ -19,6 +19,8 @@ df_orig = df
 
 app.layout = Layout(df).layout()
 
+server = app.server
+
 
 @app.callback(
     Output("g1-china-history-graph", "figure"),
