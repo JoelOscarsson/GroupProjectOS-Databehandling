@@ -3,9 +3,6 @@ import pandas as pd
 import plotly_express as px
 from functools import reduce
 import hashlib as hl
-import matplotlib.pyplot as plt
-import seaborn as sns
-import numpy as np
 
 
 def get_data_path():
@@ -42,6 +39,7 @@ def load_data(folder_path: str) -> pd.DataFrame:
 
 
 class DataProcessing:
+    """Class for processing and plotting of OS dataframe"""
     def __init__(self, df: pd.DataFrame) -> None:
         self.df = df
 
@@ -62,6 +60,7 @@ class DataProcessing:
         return DataProcessing(df)
 
     def filter_top(self, filter_col: str, filter_on_col: str, num: int):
+        """Filters top filter_col on count of filter_on_col"""
         df = self.df
 
         filter_ = list(df.groupby(filter_col)[filter_on_col].count().sort_values(ascending=False).head(num).index)
@@ -122,6 +121,7 @@ class DataProcessing:
 
     
     def proportion_plot(self, x: str, y: str, per: str, grouping: str = None): 
+        """Takes proportion: y/per"""
         df_count = self.basic_plot(x, y, grouping).df
         df_total = self.basic_plot(x, per, grouping).df
 

@@ -350,6 +350,6 @@ class Layout:
                 #         options = self._a1_plot_options,
                 #         value = "All"
                 #     )),                    
-                dbc.Row(dcc.Graph(id="a2-dist-graph"), className="mt-4"),                                                                
+                dbc.Row(dcc.Graph(id="a2-dist-graph"), className="mt-4"),
             ]
         )

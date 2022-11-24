@@ -3,20 +3,23 @@ from dash.dependencies import Output, Input
 import dash_bootstrap_components as dbc
 import plotly_express as px
 from layout import Layout
-import matplotlib.pyplot as plt
-
 from data_processing import get_data_path, load_data, DataProcessing
 
-df = DataProcessing(load_data(get_data_path()))
 
 app = dash.Dash(
     __name__,
     external_stylesheets=[dbc.themes.MATERIA],  # looks in assets map by default
     # makes responsivity possible (different web browser sizes)
     meta_tags=[dict(name="viewport", content="width=device-width, initial-scale=1.0")],
+    # suppress_callback_exceptions=True
 )
 
+df = DataProcessing(load_data(get_data_path()))
+df_orig = df
+
 app.layout = Layout(df).layout()
+
+server = app.server
 
 
 @app.callback(
@@ -27,7 +30,9 @@ app.layout = Layout(df).layout()
     Input("g1-season-radio", "value"),
 )
 def update_graph1(country, grouping, y, season):
-    df = DataProcessing(load_data(get_data_path())).filter_noc(country)
+    df = df_orig.filter_noc(country)
+    # df = df.filter_noc(country)
+    # df = DataProcessing(load_data(get_data_path())).filter_noc(country)
 
     groups = list(df.df[grouping].unique())
 
@@ -71,7 +76,8 @@ def update_graph1(country, grouping, y, season):
     Input("g2-sports-slider", "value"),
 )
 def update_graph2(dist, plot, slider):
-    df = DataProcessing(load_data(get_data_path())).filter_noc("CHN")
+    # df = DataProcessing(load_data(get_data_path())).filter_noc("CHN")
+    df = df_orig.filter_noc("CHN")
 
     if plot == "hist":
         df = df.basic_plot(dist, "ID", grouping="Sex")
@@ -102,21 +108,23 @@ def update_graph2(dist, plot, slider):
     Input("g3-sports-dropdown", "value"),
 )
 def update_graph3(plot, sport):
-    df = DataProcessing(load_data(get_data_path())).filter_noc("CHN")
+    # df = DataProcessing(load_data(get_data_path())).filter_noc("CHN")
+    df = df_orig.filter_noc("CHN")
 
     if plot == "bar":
         labels = {"value": "Medal count", "variable": "Sex"}
         if sport == "All":
             df = df.basic_plot("Sport", "Medal", grouping="Sex")
 
-            df.df["Total"] = df.df["M"] + df.df["F"]
-            df.df = df.df[df.df["Total"] >= 5]
+            df.df["Total"] = df.df["M"] + df.df["F"] # get total medal count
+            df.df = df.df[df.df["Total"] >= 5] # select sports with >= 5 medals
             df.df = df.df.sort_values(by="Total", ascending=False)
 
             fig = px.bar(df.df, x="Sport", y=["M", "F"], labels=labels)
         else:
             df.df = df.df[df.df["Sport"] == sport]
             df = df.basic_plot("Medal", "ID", grouping="Sex")
+            # order Medals as Gold -> Silver -> Bronze
             df.df = (
                 df.df.set_index("Medal").loc[["Gold", "Silver", "Bronze"]].reset_index()
             )
@@ -152,7 +160,8 @@ def update_graph3(plot, sport):
     Input("num_dropdown", "value"),
 )
 def update_graph2(num):
-    df = DataProcessing(load_data(get_data_path()))
+    # df = DataProcessing(load_data(get_data_path()))
+    df = df_orig
 
     fig = df.top_10_countries_medals(num)
     return fig
@@ -163,7 +172,8 @@ def update_graph2(num):
     Input("dist-radio", "value"),
 )
 def update_graph2(dist):
-    df = DataProcessing(load_data(get_data_path()))
+    # df = DataProcessing(load_data(get_data_path()))
+    df = df_orig
 
     fig = df.age_distribution_athletes(dist)
     return fig
@@ -174,10 +184,12 @@ def update_graph2(dist):
     Input("dist2-radio", "value"),
 )
 def update_graph2(dist2):
-    df = DataProcessing(load_data(get_data_path()))
+    # df = DataProcessing(load_data(get_data_path()))
+    df = df_orig
 
     fig = df.sex_distribution_athletes(dist2)
     return fig
+
 
 @app.callback(
     Output("a1-sport-medals-graph", "figure"),
@@ -185,17 +197,20 @@ def update_graph2(dist2):
     Input("a1-plot-radio", "value"),
 )
 def update_graph2(sport, plot):
-    df = DataProcessing(load_data(get_data_path()))
+    # df = DataProcessing(load_data(get_data_path()))
+    df = df_orig
 
     fig = df.sports_medal_plot(sport, plot)
     return fig
+
 
 @app.callback(
     Output("a2-dist-graph", "figure"),
     Input("a2-sport-radio", "value"),
 )
 def update_graph2(sport):
-    df = DataProcessing(load_data(get_data_path()))
+    # df = DataProcessing(load_data(get_data_path()))
+    df = df_orig
 
     fig = df.sports_dist_plot(sport)
     return fig
