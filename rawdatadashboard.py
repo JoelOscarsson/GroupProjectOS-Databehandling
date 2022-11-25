@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 
 
 app = dash.Dash(__name__)
+server = app.server
 
 #MAIN DATA SET
 aathlete_events =  pd.read_csv("Data/athlete_events.csv")
@@ -232,4 +233,4 @@ def update_plot(my_input,sports_input,medal_input,attributes_input,genders_input
 
 
 if __name__ == '__main__':
-	app.run_server()
+	app.run_server(debug =True)
